@@ -207,16 +207,13 @@
   }
 
   /* Envelope flap (top triangle) */
-  .env-flap {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 320px;
-    height: 130px;
-    transform-origin: top center;
-    transform-style: preserve-3d;
-    transition: transform 0s;
-    z-index: 10;
+.env-flap {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  height: 130px;
   }
 
   .env-flap-front {
@@ -445,14 +442,15 @@
   }
 
   /* perspective for 3D flap */
-  .env-flap-perspective {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 320px;
-    height: 130px;
-    perspective: 600px;
-  }
+.env-flap-perspective {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  height: 130px;
+  perspective: 600px;
+}
 </style>
 </head>
 <body>
