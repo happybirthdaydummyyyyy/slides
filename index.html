@@ -32,7 +32,6 @@
     overflow: hidden;
   }
 
-  /* Subtle paper texture background */
   body::before {
     content: '';
     position: fixed;
@@ -59,7 +58,6 @@
     z-index: 1;
   }
 
-  /* ===================== FAKE SLIDE ===================== */
   .fake-slide {
     position: absolute;
     inset: 0;
@@ -77,9 +75,7 @@
     transform: translateY(20px);
   }
 
-  .fake-slide.hidden {
-    display: none;
-  }
+  .fake-slide.hidden { display: none; }
 
   .slide-number {
     position: absolute;
@@ -116,11 +112,7 @@
     opacity: 0.5;
   }
 
-  /* Slide 4 — the "lied" slide */
-  .lied-slide .slide-title {
-    font-size: 22px;
-    line-height: 1.5;
-  }
+  .lied-slide .slide-title { font-size: 22px; line-height: 1.5; }
 
   .lied-slide .emoji-big {
     font-size: 48px;
@@ -132,7 +124,6 @@
     50% { transform: rotate(3deg); }
   }
 
-  /* ===================== DOTS NAV ===================== */
   .dots {
     position: absolute;
     bottom: -40px;
@@ -149,11 +140,8 @@
     transition: opacity 0.3s;
   }
 
-  .dot.active {
-    opacity: 1;
-  }
+  .dot.active { opacity: 1; }
 
-  /* ===================== ENVELOPE ===================== */
   .envelope-wrap {
     position: absolute;
     inset: 0;
@@ -176,7 +164,6 @@
     cursor: pointer;
   }
 
-  /* Envelope body */
   .env-body {
     position: absolute;
     top: 0;
@@ -192,7 +179,6 @@
     overflow: hidden;
   }
 
-  /* Inner V fold lines */
   .env-body::before {
     content: '';
     position: absolute;
@@ -206,7 +192,6 @@
     opacity: 0.35;
   }
 
-  /* Envelope flap (top triangle) */
   .env-flap {
     position: absolute;
     top: 0;
@@ -236,7 +221,6 @@
     backface-visibility: visible;
   }
 
-  /* Wax seal — sits at tip of flap */
   .wax-seal {
     position: absolute;
     top: calc(55% - 22px);
@@ -263,7 +247,6 @@
     border: 1.5px solid rgba(255,255,255,0.2);
   }
 
-  /* Envelope wiggle before opening */
   .envelope.wiggling {
     animation: envelopeWiggle 0.5s ease;
   }
@@ -278,7 +261,6 @@
     100% { transform: rotate(0deg) translateY(0); }
   }
 
-  /* Flap opening */
   .envelope.opening .env-flap {
     animation: flapOpen 0.8s ease forwards;
     animation-delay: 0.1s;
@@ -299,7 +281,7 @@
     100% { opacity: 0; transform: translateX(-50%) scale(0.5); }
   }
 
-  /* ===================== LETTER ===================== */
+  /* ---- LETTER FIX: raise it less so greeting stays visible ---- */
   .letter {
     position: absolute;
     bottom: 20px;
@@ -315,7 +297,6 @@
     pointer-events: none;
   }
 
-  /* Ruled lines on letter */
   .letter::before {
     content: '';
     position: absolute;
@@ -366,9 +347,7 @@
     margin-top: 4px;
   }
 
-  .letter-content .link-placeholder:hover {
-    background: #5c3317;
-  }
+  .letter-content .link-placeholder:hover { background: #5c3317; }
 
   .letter-content .sign {
     display: block;
@@ -379,6 +358,7 @@
     text-align: right;
   }
 
+  /* KEY FIX: reduced translateY from -160px to -100px so letter doesn't go too high */
   .envelope.opening .letter {
     animation: letterSlide 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
     animation-delay: 0.7s;
@@ -388,10 +368,9 @@
   @keyframes letterSlide {
     0%   { opacity: 0; transform: translateX(-50%) translateY(20px); }
     30%  { opacity: 1; }
-    100% { opacity: 1; transform: translateX(-50%) translateY(-160px); }
+    100% { opacity: 1; transform: translateX(-50%) translateY(-100px); }
   }
 
-  /* ===================== HINT TEXT ===================== */
   .hint {
     position: absolute;
     bottom: -56px;
@@ -409,7 +388,6 @@
     50% { opacity: 1; }
   }
 
-  /* ===================== SLIDE ANIMATIONS ===================== */
   @keyframes slideReveal {
     to { opacity: 1; transform: translateY(0); }
   }
@@ -422,7 +400,6 @@
     animation: slideExit 0.4s ease forwards;
   }
 
-  /* ===================== NEXT BUTTON ===================== */
   .next-btn {
     position: absolute;
     bottom: -52px;
@@ -444,7 +421,6 @@
     color: var(--warm-white);
   }
 
-  /* perspective for 3D flap */
   .env-flap-perspective {
     position: absolute;
     top: 0;
@@ -452,6 +428,31 @@
     width: 100%;
     height: 100%;
     perspective: 600px;
+  }
+
+  /* Mobile: shrink scene and reduce letter rise further */
+  @media (max-width: 480px) {
+    .scene {
+      width: 92vw;
+      height: 80vw;
+      min-height: 340px;
+    }
+
+    .envelope {
+      width: 80vw;
+      height: 52vw;
+      min-height: 160px;
+    }
+
+    .letter {
+      width: 72vw;
+    }
+
+    @keyframes letterSlide {
+      0%   { opacity: 0; transform: translateX(-50%) translateY(20px); }
+      30%  { opacity: 1; }
+      100% { opacity: 1; transform: translateX(-50%) translateY(-80px); }
+    }
   }
 </style>
 </head>
@@ -557,13 +558,11 @@
       current = index;
 
       if (current >= slides.length) {
-        // Show envelope
         slides.forEach(s => s.classList.add('hidden'));
         dotsNav.style.display = 'none';
         nextBtn.style.display = 'none';
         envelopeWrap.classList.add('visible');
 
-        // Wiggle after short delay
         setTimeout(() => {
           envelope.classList.add('wiggling');
           envelope.addEventListener('animationend', () => {
@@ -576,7 +575,7 @@
 
       slides[current].classList.remove('hidden');
       slides[current].style.animation = 'none';
-      slides[current].offsetHeight; // reflow
+      slides[current].offsetHeight;
       slides[current].style.animation = '';
       dots[current].classList.add('active');
     }, 350);
@@ -586,7 +585,6 @@
     goToSlide(current + 1);
   });
 
-  // Keyboard nav
   document.addEventListener('keydown', (e) => {
     if (e.key === 'ArrowRight' || e.key === ' ') {
       if (envelopeWrap.classList.contains('visible') && !envelopeOpened) {
