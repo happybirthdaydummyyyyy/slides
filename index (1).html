@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HappyBirthdayJaenne</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lora:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --cream: #f5f0e8;
+    --warm-white: #fdfaf4;
+    --envelope-body: #e8d5b0;
+    --envelope-dark: #c9b48a;
+    --envelope-flap: #d4c09a;
+    --envelope-shadow: #a8936a;
+    --wax: #c0392b;
+    --ink: #2c1810;
+    --paper: #fef9f0;
+    --paper-line: #e8dcc8;
+  }
+
+  body {
+    background: var(--cream);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Lora', serif;
+    overflow: hidden;
+  }
+
+  /* Subtle paper texture background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 28px,
+        rgba(180,160,120,0.08) 28px,
+        rgba(180,160,120,0.08) 29px
+      );
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .scene {
+    position: relative;
+    width: 420px;
+    height: 520px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1;
+  }
+
+  /* ===================== FAKE SLIDE ===================== */
+  .fake-slide {
+    position: absolute;
+    inset: 0;
+    background: var(--warm-white);
+    border-radius: 12px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.15), 0 4px 12px rgba(0,0,0,0.08);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    gap: 16px;
+    animation: slideReveal 0.6s ease forwards;
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  .fake-slide.hidden {
+    display: none;
+  }
+
+  .slide-number {
+    position: absolute;
+    bottom: 16px;
+    right: 20px;
+    font-size: 11px;
+    color: #bbb;
+    font-family: 'Lora', serif;
+    letter-spacing: 1px;
+  }
+
+  .slide-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--ink);
+    text-align: center;
+    line-height: 1.3;
+  }
+
+  .slide-subtitle {
+    font-size: 15px;
+    color: #000033;
+    text-align: center;
+    line-height: 1.7;
+    max-width: 300px;
+  }
+
+  .slide-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--envelope-shadow);
+    opacity: 0.5;
+  }
+
+  /* Slide 4 — the "lied" slide */
+  .lied-slide .slide-title {
+    font-size: 22px;
+    line-height: 1.5;
+  }
+
+  .lied-slide .emoji-big {
+    font-size: 48px;
+    animation: wiggleSlow 1s ease infinite;
+  }
+
+  @keyframes wiggleSlow {
+    0%, 100% { transform: rotate(-3deg); }
+    50% { transform: rotate(3deg); }
+  }
+
+  /* ===================== DOTS NAV ===================== */
+  .dots {
+    position: absolute;
+    bottom: -40px;
+    display: flex;
+    gap: 8px;
+  }
+
+  .dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--envelope-dark);
+    opacity: 0.3;
+    transition: opacity 0.3s;
+  }
+
+  .dot.active {
+    opacity: 1;
+  }
+
+  /* ===================== ENVELOPE ===================== */
+  .envelope-wrap {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .envelope-wrap.visible {
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  .envelope {
+    position: relative;
+    width: 320px;
+    height: 220px;
+    cursor: pointer;
+  }
+
+  /* Envelope body */
+  .env-body {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 180px;
+    background: var(--envelope-body);
+    border-radius: 4px 4px 8px 8px;
+    box-shadow:
+      0 8px 32px rgba(0,0,0,0.18),
+      0 2px 8px rgba(0,0,0,0.1),
+      inset 0 -2px 0 var(--envelope-shadow);
+    overflow: hidden;
+  }
+
+  /* Inner V fold lines */
+  .env-body::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background:
+      linear-gradient(135deg, var(--envelope-dark) 0%, transparent 50%),
+      linear-gradient(225deg, var(--envelope-dark) 0%, transparent 50%);
+    opacity: 0.35;
+  }
+
+  /* Envelope flap (top triangle) */
+  .env-flap {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 320px;
+    height: 130px;
+    transform-origin: top center;
+    transform-style: preserve-3d;
+    transition: transform 0s;
+    z-index: 10;
+  }
+
+  .env-flap-front {
+    position: absolute;
+    inset: 0;
+    clip-path: polygon(0 0, 100% 0, 50% 100%);
+    background: linear-gradient(160deg, var(--envelope-flap) 0%, var(--envelope-dark) 100%);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+  }
+
+  .env-flap-back {
+    position: absolute;
+    inset: 0;
+    clip-path: polygon(0 0, 100% 0, 50% 100%);
+    background: linear-gradient(160deg, #d4b896 0%, #c4a878 100%);
+    transform: rotateX(180deg);
+    backface-visibility: visible;
+  }
+
+  /* Wax seal */
+  .wax-seal {
+    position: absolute;
+    top: 88px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 44px;
+    height: 44px;
+    background: radial-gradient(circle at 35% 35%, #e74c3c, var(--wax) 60%, #922b21);
+    border-radius: 50%;
+    z-index: 20;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    transition: opacity 0.3s, transform 0.3s;
+  }
+
+  .wax-seal::after {
+    content: '';
+    position: absolute;
+    inset: 4px;
+    border-radius: 50%;
+    border: 1.5px solid rgba(255,255,255,0.2);
+  }
+
+  /* Envelope wiggle before opening */
+  .envelope.wiggling {
+    animation: envelopeWiggle 0.5s ease;
+  }
+
+  @keyframes envelopeWiggle {
+    0%   { transform: rotate(0deg) translateY(0); }
+    15%  { transform: rotate(-3deg) translateY(-3px); }
+    30%  { transform: rotate(3deg) translateY(-5px); }
+    45%  { transform: rotate(-2deg) translateY(-3px); }
+    60%  { transform: rotate(2deg) translateY(-2px); }
+    75%  { transform: rotate(-1deg) translateY(-1px); }
+    100% { transform: rotate(0deg) translateY(0); }
+  }
+
+  /* Flap opening */
+  .envelope.opening .env-flap {
+    animation: flapOpen 0.8s ease forwards;
+    animation-delay: 0.1s;
+  }
+
+  .envelope.opening .wax-seal {
+    animation: sealFade 0.4s ease forwards;
+    animation-delay: 0.1s;
+  }
+
+  @keyframes flapOpen {
+    0%   { transform: rotateX(0deg); }
+    100% { transform: rotateX(-180deg); }
+  }
+
+  @keyframes sealFade {
+    0%   { opacity: 1; transform: translateX(-50%) scale(1); }
+    100% { opacity: 0; transform: translateX(-50%) scale(0.5); }
+  }
+
+  /* ===================== LETTER ===================== */
+  .letter {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%) translateY(0);
+    width: 280px;
+    background: var(--paper);
+    border-radius: 3px;
+    padding: 28px 24px;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.1);
+    z-index: 5;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  /* Ruled lines on letter */
+  .letter::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: repeating-linear-gradient(
+      transparent,
+      transparent 23px,
+      var(--paper-line) 23px,
+      var(--paper-line) 24px
+    );
+    border-radius: 3px;
+    pointer-events: none;
+  }
+
+  .letter-content {
+    position: relative;
+    z-index: 1;
+    font-family: 'Lora', serif;
+    font-size: 14px;
+    line-height: 1.85;
+    color: var(--ink);
+  }
+
+  .letter-content .dear {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 16px;
+    margin-bottom: 12px;
+    display: block;
+  }
+
+  .letter-content .message {
+    color: #000000;
+    margin-bottom: 16px;
+    display: block;
+  }
+
+  .letter-content .link-placeholder {
+    display: inline-block;
+    background: var(--ink);
+    color: var(--cream);
+    padding: 8px 16px;
+    border-radius: 3px;
+    font-size: 12px;
+    text-decoration: none;
+    letter-spacing: 0.5px;
+    transition: background 0.2s;
+    margin-top: 4px;
+  }
+
+  .letter-content .link-placeholder:hover {
+    background: #5c3317;
+  }
+
+  .letter-content .sign {
+    display: block;
+    margin-top: 16px;
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 14px;
+    text-align: right;
+  }
+
+  .envelope.opening .letter {
+    animation: letterSlide 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    animation-delay: 0.7s;
+    pointer-events: all;
+  }
+
+  @keyframes letterSlide {
+    0%   { opacity: 0; transform: translateX(-50%) translateY(20px); }
+    30%  { opacity: 1; }
+    100% { opacity: 1; transform: translateX(-50%) translateY(-160px); }
+  }
+
+  /* ===================== HINT TEXT ===================== */
+  .hint {
+    position: absolute;
+    bottom: -56px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 12px;
+    color: var(--envelope-shadow);
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+    animation: hintPulse 2s ease infinite;
+  }
+
+  @keyframes hintPulse {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 1; }
+  }
+
+  /* ===================== SLIDE ANIMATIONS ===================== */
+  @keyframes slideReveal {
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes slideExit {
+    to { opacity: 0; transform: translateY(-20px); }
+  }
+
+  .fake-slide.exiting {
+    animation: slideExit 0.4s ease forwards;
+  }
+
+  /* ===================== NEXT BUTTON ===================== */
+  .next-btn {
+    position: absolute;
+    bottom: -52px;
+    right: 0;
+    background: none;
+    border: 1.5px solid var(--envelope-dark);
+    color: var(--envelope-shadow);
+    font-family: 'Lora', serif;
+    font-size: 12px;
+    padding: 7px 18px;
+    border-radius: 20px;
+    cursor: pointer;
+    letter-spacing: 0.5px;
+    transition: all 0.2s;
+  }
+
+  .next-btn:hover {
+    background: var(--envelope-dark);
+    color: var(--warm-white);
+  }
+
+  /* perspective for 3D flap */
+  .env-flap-perspective {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 320px;
+    height: 130px;
+    perspective: 600px;
+  }
+</style>
+</head>
+<body>
+
+<div class="scene">
+
+  <!-- SLIDE 1 -->
+  <div class="fake-slide" id="slide1">
+    <div class="slide-dot"></div>
+    <div class="slide-title">happy birthday Jaenne!!!🙈🙊🙉</div>
+    <div class="slide-subtitle">sorry i really don't know what to get you, so i just made this nonsense for you hehe😅😅</div>
+    <span class="slide-number">1 / 4</span>
+  </div>
+
+  <!-- SLIDE 2 -->
+  <div class="fake-slide hidden" id="slide2">
+    <div class="slide-dot"></div>
+    <div class="slide-title">be happy with it dumbass idccc</div>
+    <div class="slide-subtitle">hehe i wanted to get you something you can keep, so please don't lose this link ever yeah🤬</div>
+    <span class="slide-number">2 / 4</span>
+  </div>
+
+    <!-- SLIDE 3 -->
+  <div class="fake-slide hidden" id="slide4">
+    <div class="slide-dot"></div>
+    <div class="slide-title">Appreciation💙</div>
+    <div class="slide-subtitle">Although we only started hanging out last trimester, so much has happened hehe thank you for being such a big part of my uni life!! i really hope we would still meet up once in a while after we graduate okayy!! i love your smile so much hehe please don't ever stop smiling okayy you're such a happy pill<br><br>zz i hope u can stop attracting so many guys asiejrng hahha and and if you ever lose this link, i'll never forgive u🤡<br><br>okay bye i'm done being annoying please don't be disappointed yeah? hehe i love you lots🐽 HUUHH haha fuck you</div>
+    <span class="slide-number">3 / 4</span>
+  </div>
+
+  <!-- SLIDE 4 — the lied slide -->
+  <div class="fake-slide hidden lied-slide" id="slide3">
+    <div class="emoji-big">👀</div>
+    <div class="slide-title">okay wait i lied…<br><br>HAHA i made this cos you guessed it first,, sooo i wanna troll you HEHE<br><br>i actually made you something else</div>
+    <span class="slide-number">4 / 4</span>
+  </div>
+
+  <!-- ENVELOPE -->
+  <div class="envelope-wrap" id="envelopeWrap">
+    <div class="envelope" id="envelope">
+
+      <div class="letter" id="letter">
+        <div class="letter-content">
+          <span class="dear">hi my dummy,</span>
+          <span class="message">this is your actual birthday present, click the box below!! don't be disappointed if this presentation slide is better than the actual stuff aye HAHA<br><br>happiest 80th birthday to you dummy🤍🤍</span>
+          <a href='https://thisisforyoudummyyy.github.io/openwhen/' target='_blank' class="link-placeholder" style='color:#c45c8a; font-weight:600; text-decoration:none;'>happy birthday my love😉🤪</a>          
+          <span class="sign">farmer</span>
+        </div>
+      </div>
+
+      <div class="env-body"></div>
+
+      <div class="env-flap-perspective">
+        <div class="env-flap">
+          <div class="env-flap-front"></div>
+          <div class="env-flap-back"></div>
+        </div>
+      </div>
+
+      <div class="wax-seal">💙</div>
+    </div>
+    <div class="hint" id="hint">click to open</div>
+  </div>
+
+  <!-- DOTS -->
+  <div class="dots" id="dots">
+    <div class="dot active"></div>
+    <div class="dot"></div>
+    <div class="dot"></div>
+    <div class="dot"></div>
+  </div>
+
+  <!-- NEXT BUTTON -->
+  <button class="next-btn" id="nextBtn">next →</button>
+
+</div>
+
+<script>
+  const slides = [
+    document.getElementById('slide1'),
+    document.getElementById('slide2'),
+    document.getElementById('slide4'),
+    document.getElementById('slide3'),
+  ];
+  const dots = document.querySelectorAll('.dot');
+  const nextBtn = document.getElementById('nextBtn');
+  const envelopeWrap = document.getElementById('envelopeWrap');
+  const envelope = document.getElementById('envelope');
+  const hint = document.getElementById('hint');
+  const dotsNav = document.getElementById('dots');
+
+  let current = 0;
+  let envelopeOpened = false;
+
+  function goToSlide(index) {
+    slides[current].classList.add('exiting');
+    dots[current].classList.remove('active');
+
+    setTimeout(() => {
+      slides[current].classList.add('hidden');
+      slides[current].classList.remove('exiting');
+      current = index;
+
+      if (current >= slides.length) {
+        // Show envelope
+        slides.forEach(s => s.classList.add('hidden'));
+        dotsNav.style.display = 'none';
+        nextBtn.style.display = 'none';
+        envelopeWrap.classList.add('visible');
+
+        // Wiggle after short delay
+        setTimeout(() => {
+          envelope.classList.add('wiggling');
+          envelope.addEventListener('animationend', () => {
+            envelope.classList.remove('wiggling');
+          }, { once: true });
+        }, 600);
+
+        return;
+      }
+
+      slides[current].classList.remove('hidden');
+      slides[current].style.animation = 'none';
+      slides[current].offsetHeight; // reflow
+      slides[current].style.animation = '';
+      dots[current].classList.add('active');
+    }, 350);
+  }
+
+  nextBtn.addEventListener('click', () => {
+    goToSlide(current + 1);
+  });
+
+  // Keyboard nav
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight' || e.key === ' ') {
+      if (envelopeWrap.classList.contains('visible') && !envelopeOpened) {
+        openEnvelope();
+      } else if (!envelopeWrap.classList.contains('visible')) {
+        goToSlide(current + 1);
+      }
+    }
+  });
+
+  function openEnvelope() {
+    if (envelopeOpened) return;
+    envelopeOpened = true;
+    hint.style.opacity = '0';
+    envelope.classList.add('opening');
+  }
+
+  envelope.addEventListener('click', openEnvelope);
+</script>
+
+</body>
+</html>
