@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Happy Birthday Stupidhead</title>
+<title>Envelope Reveal</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lora:ital@0;1&display=swap" rel="stylesheet">
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -67,12 +67,13 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    padding: 40px;
+    justify-content: flex-start;
+    padding: 40px 40px 50px;
     gap: 16px;
     animation: slideReveal 0.6s ease forwards;
     opacity: 0;
     transform: translateY(20px);
+    overflow: hidden;
   }
 
   .fake-slide.hidden { display: none; }
@@ -94,6 +95,8 @@
     color: var(--ink);
     text-align: center;
     line-height: 1.3;
+    flex-shrink: 0;
+    margin-top: auto;
   }
 
   .slide-subtitle {
@@ -102,6 +105,9 @@
     text-align: center;
     line-height: 1.7;
     max-width: 300px;
+    overflow-y: auto;
+    flex: 1;
+    margin-bottom: auto;
   }
 
   .slide-dot {
@@ -110,6 +116,8 @@
     border-radius: 50%;
     background: var(--envelope-shadow);
     opacity: 0.5;
+    flex-shrink: 0;
+    margin-top: auto;
   }
 
   .lied-slide .slide-title { font-size: 22px; line-height: 1.5; }
@@ -117,6 +125,8 @@
   .lied-slide .emoji-big {
     font-size: 48px;
     animation: wiggleSlow 1s ease infinite;
+    flex-shrink: 0;
+    margin-top: auto;
   }
 
   @keyframes wiggleSlow {
@@ -166,10 +176,8 @@
 
   .env-body {
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
     background: var(--envelope-body);
     border-radius: 4px 4px 8px 8px;
     box-shadow:
@@ -182,10 +190,8 @@
   .env-body::before {
     content: '';
     position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    bottom: 0; left: 0;
+    width: 100%; height: 100%;
     background:
       linear-gradient(135deg, var(--envelope-dark) 0%, transparent 50%),
       linear-gradient(225deg, var(--envelope-dark) 0%, transparent 50%);
@@ -194,10 +200,8 @@
 
   .env-flap {
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
     transform-origin: top center;
     transform-style: preserve-3d;
     transition: transform 0s;
@@ -226,8 +230,7 @@
     top: calc(55% - 22px);
     left: 50%;
     transform: translateX(-50%);
-    width: 44px;
-    height: 44px;
+    width: 44px; height: 44px;
     background: radial-gradient(circle at 35% 35%, #e74c3c, var(--wax) 60%, #922b21);
     border-radius: 50%;
     z-index: 20;
@@ -247,9 +250,7 @@
     border: 1.5px solid rgba(255,255,255,0.2);
   }
 
-  .envelope.wiggling {
-    animation: envelopeWiggle 0.5s ease;
-  }
+  .envelope.wiggling { animation: envelopeWiggle 0.5s ease; }
 
   @keyframes envelopeWiggle {
     0%   { transform: rotate(0deg) translateY(0); }
@@ -281,7 +282,6 @@
     100% { opacity: 0; transform: translateX(-50%) scale(0.5); }
   }
 
-  /* ---- LETTER FIX: raise it less so greeting stays visible ---- */
   .letter {
     position: absolute;
     bottom: 20px;
@@ -315,7 +315,7 @@
     position: relative;
     z-index: 1;
     font-family: 'Verdana', serif;
-    font-size: 16px;
+    font-size: 15px;
     line-height: 1.85;
     color: var(--ink);
   }
@@ -358,17 +358,17 @@
     text-align: right;
   }
 
-  /* KEY FIX: reduced translateY from -160px to -100px so letter doesn't go too high */
+  /* Desktop letter animation — rises -160px */
   .envelope.opening .letter {
-    animation: letterSlide 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    animation: letterSlideDesktop 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
     animation-delay: 0.7s;
     pointer-events: all;
   }
 
-  @keyframes letterSlide {
+  @keyframes letterSlideDesktop {
     0%   { opacity: 0; transform: translateX(-50%) translateY(20px); }
     30%  { opacity: 1; }
-    100% { opacity: 1; transform: translateX(-50%) translateY(-100px); }
+    100% { opacity: 1; transform: translateX(-50%) translateY(-160px); }
   }
 
   .hint {
@@ -396,9 +396,7 @@
     to { opacity: 0; transform: translateY(-20px); }
   }
 
-  .fake-slide.exiting {
-    animation: slideExit 0.4s ease forwards;
-  }
+  .fake-slide.exiting { animation: slideExit 0.4s ease forwards; }
 
   .next-btn {
     position: absolute;
@@ -423,20 +421,36 @@
 
   .env-flap-perspective {
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
     perspective: 600px;
   }
 
-  /* Mobile: shrink scene and reduce letter rise further */
+  /* ---- MOBILE ---- */
   @media (max-width: 480px) {
     .scene {
       width: 92vw;
-      height: 80vw;
-      min-height: 340px;
+      height: 92vw;
+      min-height: 360px;
+      max-height: 500px;
     }
+
+    .fake-slide {
+      padding: 28px 24px 44px;
+      justify-content: flex-start;
+    }
+
+    .slide-title {
+      font-size: 20px;
+      margin-top: 8px;
+    }
+
+    .slide-subtitle {
+      font-size: 12px;
+      max-height: 220px;
+    }
+
+    .lied-slide .slide-title { font-size: 16px; }
 
     .envelope {
       width: 80vw;
@@ -446,9 +460,16 @@
 
     .letter {
       width: 72vw;
+      padding: 20px 16px;
     }
 
-    @keyframes letterSlide {
+    /* Mobile letter animation — rises only -80px */
+    .envelope.opening .letter {
+      animation: letterSlideMobile 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards !important;
+      animation-delay: 0.7s !important;
+    }
+
+    @keyframes letterSlideMobile {
       0%   { opacity: 0; transform: translateX(-50%) translateY(20px); }
       30%  { opacity: 1; }
       100% { opacity: 1; transform: translateX(-50%) translateY(-80px); }
@@ -581,9 +602,7 @@
     }, 350);
   }
 
-  nextBtn.addEventListener('click', () => {
-    goToSlide(current + 1);
-  });
+  nextBtn.addEventListener('click', () => { goToSlide(current + 1); });
 
   document.addEventListener('keydown', (e) => {
     if (e.key === 'ArrowRight' || e.key === ' ') {
