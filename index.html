@@ -629,12 +629,14 @@
 </script>
 <script>
   function sendNotif(btn) {
-    btn.textContent = 'sending...';
-    btn.disabled = true;
-    emailjs.send("service_e5w52m3", "template_hwu65tk")
-      .then(() => { btn.textContent = 'sent!! 💙'; })
-      .catch(() => { btn.textContent = 'try again 😅'; btn.disabled = false; });
-  }
+  btn.textContent = 'sending...';
+  btn.disabled = true;
+  emailjs.send("service_e5w52m3", "template_hwu65tk", {
+    email: "bryancharlotte2133@gmail.com"  // fills in the {{email}} field
+  })
+    .then(() => { btn.textContent = 'sent!! 💙'; })
+    .catch(() => { btn.textContent = 'try again 😅'; btn.disabled = false; });
+}
 </script>
 </body>
 </html>
