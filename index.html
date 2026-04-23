@@ -477,6 +477,8 @@
     }
   }
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script>emailjs.init("QhZrAo2oVk0m8QcFi");</script>
 </head>
 <body>
 
@@ -522,6 +524,7 @@
           <span class="dear">hi my stupidhead,</span>
           <span class="message">this is your actual birthday present, click the box below!! don't be disappointed if this nonsense is better than the actual stuff okay HAHA<br><br>happiest 80th birthday to you dummy🤍🤍</span>
           <a href='https://thisisforyoudummyyy.github.io/openwhen/' target='_blank' class="link-placeholder" style='color:#94C1D9; font-weight:600; text-decoration:none;'>happy birthday my love😉🤪</a>
+          <button onclick="sendNotif(this)" class="link-placeholder" style="color:#94C1D9; font-weight:600; border:none; cursor:pointer; margin-top:8px; display:inline-block;">i've opened it!! 🎉</button>
           <span class="sign">-HUUUHHH ahahaha</span>
         </div>
       </div>
@@ -624,6 +627,14 @@
 
   envelope.addEventListener('click', openEnvelope);
 </script>
-
+<script>
+  function sendNotif(btn) {
+    btn.textContent = 'sending...';
+    btn.disabled = true;
+    emailjs.send("service_e5w52m3", "template_hwu65tk")
+      .then(() => { btn.textContent = 'sent!! 💙'; })
+      .catch(() => { btn.textContent = 'try again 😅'; btn.disabled = false; });
+  }
+</script>
 </body>
 </html>
